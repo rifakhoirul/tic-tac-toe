@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #0f172a;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #e2e8f0;
+    gap: 1.5rem;
+  }
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .status {
+    font-size: 1.25rem;
+    min-height: 2rem;
+    color: #94a3b8;
+  }
+  .status .x { color: #60a5fa; font-weight: 600; }
+  .status .o { color: #f472b6; font-weight: 600; }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    width: 300px;
+    height: 300px;
+  }
+  .cell {
+    background: #1e293b;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .cell:hover:not(.taken) { background: #334155; }
+  .cell.x { color: #60a5fa; }
+  .cell.o { color: #f472b6; }
+  .cell.taken { cursor: default; }
+  .cell.win {
+    background: #1e3a5f;
+    animation: pulse 0.6s ease-in-out infinite alternate;
+  }
+  @keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+  }
+  button {
+    padding: 0.6rem 1.5rem;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  button:hover { background: #334155; border-color: #475569; }
+  .scoreboard {
+    display: flex;
+    gap: 2rem;
+    font-size: 1.1rem;
+  }
+  .scoreboard span { font-weight: 600; }
+  .score-x { color: #60a5fa; }
+  .score-o { color: #f472b6; }
+  .score-draw { color: #94a3b8; }
+</style>
+</head>
+<body>
+<h1>Tic Tac Toe</h1>
+<div class="status" id="status">X's turn</div>
+<div class="board" id="board"></div>
+<div class="scoreboard" id="scoreboard"></div>
+<button id="resetBtn">New Game</button>
+<script>
+const WIN_COMBOS = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+let board, currentPlayer, gameOver, scores, winCombo;
+
+function init() {
+  board = Array(9).fill(null);
+  currentPlayer = 'X';
+  gameOver = false;
+  winCombo = null;
+  render();
+}
+
+function render() {
+  const boardEl = document.getElementById('board');
+  boardEl.innerHTML = '';
+  board.forEach((val, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (val ? ' taken ' + val.toLowerCase() : '') + (winCombo && winCombo.includes(i) ? ' win' : '');
+    cell.textContent = val || '';
+    cell.addEventListener('click', () => handleClick(i));
+    boardEl.appendChild(cell);
+  });
+
+  const status = document.getElementById('status');
+  if (gameOver) {
+    if (winCombo) status.innerHTML = `<span class="${currentPlayer.toLowerCase()}">${currentPlayer}</span> wins!`;
+    else status.textContent = "It's a draw!";
+  } else {
+    status.innerHTML = `<span class="${currentPlayer.toLowerCase()}">${currentPlayer}</span>'s turn`;
+  }
+
+  const sb = document.getElementById('scoreboard');
+  sb.innerHTML = `
+    <div>X: <span class="score-x">${scores.X}</span></div>
+    <div>O: <span class="score-o">${scores.O}</span></div>
+    <div>Draw: <span class="score-draw">${scores.draw}</span></div>
+  `;
+}
+
+function handleClick(i) {
+  if (board[i] || gameOver) return;
+  board[i] = currentPlayer;
+  const win = checkWin();
+  if (win) {
+    winCombo = win;
+    gameOver = true;
+    scores[currentPlayer]++;
+  } else if (board.every(c => c)) {
+    gameOver = true;
+    scores.draw++;
+  } else {
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  }
+  render();
+}
+
+function checkWin() {
+  for (const combo of WIN_COMBOS) {
+    const [a, b, c] = combo;
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) return combo;
+  }
+  return null;
+}
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  init();
+});
+
+scores = { X: 0, O: 0, draw: 0 };
+init();
+</script>
+</body>
+</html>
