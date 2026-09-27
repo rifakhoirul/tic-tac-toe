@@ -98,6 +98,11 @@ const WIN_COMBOS = [
 
 let board, currentPlayer, gameOver, scores, winCombo;
 
+const boardEl = document.getElementById('board');
+const statusEl = document.getElementById('status');
+const scoreboardEl = document.getElementById('scoreboard');
+const resetBtnEl = document.getElementById('resetBtn');
+
 function init() {
   board = Array(9).fill(null);
   currentPlayer = 'X';
@@ -107,7 +112,6 @@ function init() {
 }
 
 function render() {
-  const boardEl = document.getElementById('board');
   boardEl.innerHTML = '';
   board.forEach((val, i) => {
     const cell = document.createElement('div');
@@ -117,16 +121,14 @@ function render() {
     boardEl.appendChild(cell);
   });
 
-  const status = document.getElementById('status');
   if (gameOver) {
-    if (winCombo) status.innerHTML = `<span class="${currentPlayer.toLowerCase()}">${currentPlayer}</span> wins!`;
-    else status.textContent = "It's a draw!";
+    if (winCombo) statusEl.innerHTML = `<span class="${currentPlayer.toLowerCase()}">${currentPlayer}</span> wins!`;
+    else statusEl.textContent = "It's a draw!";
   } else {
-    status.innerHTML = `<span class="${currentPlayer.toLowerCase()}">${currentPlayer}</span>'s turn`;
+    statusEl.innerHTML = `<span class="${currentPlayer.toLowerCase()}">${currentPlayer}</span>'s turn`;
   }
 
-  const sb = document.getElementById('scoreboard');
-  sb.innerHTML = `
+  scoreboardEl.innerHTML = `
     <div>X: <span class="score-x">${scores.X}</span></div>
     <div>O: <span class="score-o">${scores.O}</span></div>
     <div>Draw: <span class="score-draw">${scores.draw}</span></div>
@@ -158,7 +160,7 @@ function checkWin() {
   return null;
 }
 
-document.getElementById('resetBtn').addEventListener('click', () => {
+resetBtnEl.addEventListener('click', () => {
   init();
 });
 
