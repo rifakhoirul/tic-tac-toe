@@ -103,18 +103,24 @@ function init() {
   currentPlayer = 'X';
   gameOver = false;
   winCombo = null;
+
+  const boardEl = document.getElementById('board');
+  if (boardEl.children.length === 0) {
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('div');
+      cell.addEventListener('click', () => handleClick(i));
+      boardEl.appendChild(cell);
+    }
+  }
   render();
 }
 
 function render() {
   const boardEl = document.getElementById('board');
-  boardEl.innerHTML = '';
   board.forEach((val, i) => {
-    const cell = document.createElement('div');
+    const cell = boardEl.children[i];
     cell.className = 'cell' + (val ? ' taken ' + val.toLowerCase() : '') + (winCombo && winCombo.includes(i) ? ' win' : '');
     cell.textContent = val || '';
-    cell.addEventListener('click', () => handleClick(i));
-    boardEl.appendChild(cell);
   });
 
   const status = document.getElementById('status');
